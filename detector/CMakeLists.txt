@@ -11,18 +11,24 @@ set(CMAKE_CXX_STANDARD 17)
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
 
-add_executable(detector_node src/detector_node.cpp)
+set(dependencies rclcpp rclcpp_components )
+
+add_library(detector_node SHARED src/DetectorNode.cpp)
+ament_target_dependencies(detector_node ${dependencies})
+rclcpp_components_register_nodes(detector_node
+                                 "rt_vision::DetectorNode")
+
+
 target_include_directories(detector_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 target_compile_features(detector_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 
 install(TARGETS detector_node
-  DESTINATION lib/${PROJECT_NAME})
+  DESTINATION lib)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
