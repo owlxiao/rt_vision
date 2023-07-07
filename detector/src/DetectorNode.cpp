@@ -1,6 +1,7 @@
 #include "detector/DetectorNode.h"
 
-#include "rcpputils/asserts.hpp"
+#include <opencv2/highgui.hpp>
+#include <rcpputils/asserts.hpp>
 
 namespace rt_vision {
 
@@ -9,6 +10,10 @@ DetectorNode::DetectorNode(const rclcpp::NodeOptions &options)
   RCLCPP_INFO(get_logger(), "Starting DetectorNode!");
 
   initializeParameters();
+
+  if (this->_isPreview) {
+    createPreviewWindow();
+  }
 }
 
 void DetectorNode::initializeParameters() {
@@ -37,6 +42,11 @@ void DetectorNode::initializeParameters() {
   RCLCPP_INFO(get_logger(), "Set parameter publish_objects_topic_name: `%s`",
               _pubObjectsTopicName.c_str());
   rcpputils::assert_true(!_pubObjectsTopicName.empty());
+}
+
+void DetectorNode::createPreviewWindow() {
+  std::string windowName{"DetectorNode: Preview"};
+  cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
 }
 
 } // namespace rt_vision

@@ -11,6 +11,7 @@ public:
 
 private:
   void initializeParameters(void);
+  void createPreviewWindow(void);
 
 private:
   bool _isPreview{};
