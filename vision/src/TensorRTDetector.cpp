@@ -54,6 +54,10 @@ TensorRTDetector::TensorRTDetector(std::string &engineFilePath, int device,
   auto out_dims = _engine->getTensorShape(OUTPUT_BLOB_NAME);
   _outputSize = std::accumulate(out_dims.d, out_dims.d + out_dims.nbDims, 1,
                                 std::multiplies<int>());
+
+  auto inputDims = _engine->getTensorShape(INPUT_BLOB_NAME);
+  _input_h = inputDims.d[2];
+  _input_w = inputDims.d[3];
 }
 
 std::vector<Object> TensorRTDetector::inference(const cv::Mat &frame) {
