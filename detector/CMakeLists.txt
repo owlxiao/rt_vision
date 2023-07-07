@@ -31,6 +31,12 @@ target_compile_features(detector_node PUBLIC c_std_99 cxx_std_17)  # Require C99
 install(TARGETS detector_node
   DESTINATION lib)
 
+install(DIRECTORY
+  labels
+  ../model
+  DESTINATION share/${PROJECT_NAME}
+)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
