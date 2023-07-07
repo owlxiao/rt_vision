@@ -21,6 +21,7 @@ private:
   std::string _engineFilePath{};
   std::string _subImageTopicName{};
   std::string _pubObjectsTopicName{};
+  std::string _classLabelsPath{};
 
   std::unique_ptr<VisionDetector> _inferEngine{nullptr};
 };

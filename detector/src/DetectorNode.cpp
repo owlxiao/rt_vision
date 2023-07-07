@@ -17,7 +17,7 @@ DetectorNode::DetectorNode(const rclcpp::NodeOptions &options)
   }
 
   /// FIXME: Use parameter in bringup launch script
-  int device = 0; 
+  int device = 0;
   float confNmsThresh{0.0f};
   float confBboxThresh{0.0f};
 
@@ -51,6 +51,11 @@ void DetectorNode::initializeParameters() {
   RCLCPP_INFO(get_logger(), "Set parameter publish_objects_topic_name: `%s`",
               _pubObjectsTopicName.c_str());
   rcpputils::assert_true(!_pubObjectsTopicName.empty());
+
+  _classLabelsPath = this->declare_parameter<std::string>("class_labels_path");
+  rcpputils::assert_true(!_classLabelsPath.empty());
+  RCLCPP_INFO(get_logger(), "Set parameter class_labels_path: `%s`",
+              _classLabelsPath.c_str());
 }
 
 void DetectorNode::createPreviewWindow() {
