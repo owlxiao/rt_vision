@@ -34,6 +34,8 @@ public:
                     const float bboxConfThresh, float scale, const int imgWidth,
                     const int imgHeight);
 
+  virtual std::vector<Object> inference(const cv::Mat &frame) = 0;
+
 private:
   void generateGridsAndStride(std::vector<std::size_t> &strides,
                               std::vector<GridAndStride> &gridStrides);

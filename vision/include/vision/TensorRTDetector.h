@@ -27,7 +27,7 @@ public:
                    float confBboxThresh, std::size_t confNumClasses);
 
 public:
-  std::vector<Object> inference(const cv::Mat &frame);
+  virtual std::vector<Object> inference(const cv::Mat &frame) override;
   void doInference(float *input, float *output);
 
 private:
