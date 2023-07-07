@@ -1,10 +1,42 @@
 #include "detector/DetectorNode.h"
 
+#include "rcpputils/asserts.hpp"
+
 namespace rt_vision {
 
 DetectorNode::DetectorNode(const rclcpp::NodeOptions &options)
     : rclcpp::Node("detector", options) {
   RCLCPP_INFO(get_logger(), "Starting DetectorNode!");
+
+  initializeParameters();
+}
+
+void DetectorNode::initializeParameters() {
+  _isPreview = this->declare_parameter<bool>("is_preview", true);
+  RCLCPP_INFO(get_logger(), "Set parameter is_preview: %i", _isPreview);
+
+  _engineFilePath =
+      this->declare_parameter<std::string>("engine_file_path", "");
+  RCLCPP_INFO(get_logger(), "Set parameter engine_file_path: `%s`",
+              _engineFilePath.c_str());
+  rcpputils::assert_true(!_engineFilePath.empty());
+
+  int numClasses = this->declare_parameter<int>("num_classes", 1);
+  rcpputils::assert_true(numClasses >= 0);
+  _numClasses = numClasses;
+  RCLCPP_INFO(get_logger(), "Set parameter num_classes: %zu", _numClasses);
+
+  _subImageTopicName = this->declare_parameter<std::string>(
+      "subscribe_image_topic_name", "camera/color/image_raw");
+  RCLCPP_INFO(get_logger(), "Set parameter subscribe_image_topic_name: `%s`",
+              _subImageTopicName.c_str());
+  rcpputils::assert_true(!_subImageTopicName.empty());
+
+  _pubObjectsTopicName = this->declare_parameter<std::string>(
+      "publish_objects_topic_name", "detector/objects");
+  RCLCPP_INFO(get_logger(), "Set parameter publish_objects_topic_name: `%s`",
+              _pubObjectsTopicName.c_str());
+  rcpputils::assert_true(!_pubObjectsTopicName.empty());
 }
 
 } // namespace rt_vision
