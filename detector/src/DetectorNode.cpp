@@ -94,7 +94,26 @@ void DetectorNode::loadClassLabelsFile() {
 
 void DetectorNode::colorImageCallback(
     const sensor_msgs::msg::Image::ConstSharedPtr &ptr) {
-  (void)ptr;
+  auto img = cv_bridge::toCvCopy(ptr, "bgr8");
+  cv::Mat frame = img->image;
+
+  auto now = std::chrono::system_clock::now();
+
+  auto objects = this->_inferEngine->inference(frame);
+
+  auto end = std::chrono::system_clock::now();
+  auto elapsed =
+      std::chrono::duration_cast<std::chrono::milliseconds>(end - now);
+  RCLCPP_INFO(this->get_logger(), "Inference: %f FPS",
+              1000.0f / elapsed.count());
+
+  if (this->_isPreview) {
+    cv::imshow("DetectorNode: Preview", frame);
+    auto key = cv::waitKey(1);
+    if (key == 'q') {
+      rclcpp::shutdown();
+    }
+  }
 }
 
 } // namespace rt_vision
