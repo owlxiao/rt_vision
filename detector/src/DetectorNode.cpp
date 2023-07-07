@@ -1,4 +1,5 @@
 #include "detector/DetectorNode.h"
+#include "vision/TensorRTDetector.h"
 
 #include <opencv2/highgui.hpp>
 #include <rcpputils/asserts.hpp>
@@ -14,6 +15,14 @@ DetectorNode::DetectorNode(const rclcpp::NodeOptions &options)
   if (this->_isPreview) {
     createPreviewWindow();
   }
+
+  /// FIXME: Use parameter in bringup launch script
+  int device = 0; 
+  float confNmsThresh{0.0f};
+  float confBboxThresh{0.0f};
+
+  _inferEngine = std::make_unique<TensorRTDetector>(
+      _engineFilePath, device, confNmsThresh, confBboxThresh, _numClasses);
 }
 
 void DetectorNode::initializeParameters() {

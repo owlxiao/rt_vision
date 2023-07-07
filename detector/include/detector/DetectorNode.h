@@ -1,6 +1,8 @@
 #ifndef DETECTOR_DETECTORNODE_H
 #define DETECTOR_DETECTORNODE_H
 
+#include "vision/VisionDetector.h"
+
 #include <rclcpp/rclcpp.hpp>
 
 namespace rt_vision {
@@ -19,6 +21,8 @@ private:
   std::string _engineFilePath{};
   std::string _subImageTopicName{};
   std::string _pubObjectsTopicName{};
+
+  std::unique_ptr<VisionDetector> _inferEngine{nullptr};
 };
 
 } // namespace rt_vision
