@@ -20,6 +20,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 # CUDA Package
 find_package(CUDA REQUIRED)
+find_library(NVINFER  NAMES nvinfer)
 
 if(NOT CUDA_FOUND)
     message(FATAL_ERROR "CUDA not found on this system.")
@@ -37,6 +38,10 @@ add_library(vision SHARED
 ament_target_dependencies(vision
   CUDA 
   OpenCV
+)
+
+target_link_libraries(vision
+  nvinfer
 )
 
 target_include_directories(vision PUBLIC
