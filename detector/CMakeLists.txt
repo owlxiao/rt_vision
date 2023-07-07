@@ -14,9 +14,8 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(vision REQUIRED)
-find_package(OpenCV REQUIRED)
 
-set(dependencies rclcpp rclcpp_components vision OpenCV )
+set(dependencies rclcpp rclcpp_components vision )
 
 add_library(detector_node SHARED src/DetectorNode.cpp)
 ament_target_dependencies(detector_node ${dependencies})
