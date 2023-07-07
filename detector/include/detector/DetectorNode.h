@@ -14,6 +14,7 @@ public:
 private:
   void initializeParameters(void);
   void createPreviewWindow(void);
+  void loadClassLabelsFile(void);
 
 private:
   bool _isPreview{};
@@ -24,6 +25,7 @@ private:
   std::string _classLabelsPath{};
 
   std::unique_ptr<VisionDetector> _inferEngine{nullptr};
+  std::vector<std::string> classNames{};
 };
 
 } // namespace rt_vision

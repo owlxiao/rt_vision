@@ -4,6 +4,8 @@
 #include <opencv2/highgui.hpp>
 #include <rcpputils/asserts.hpp>
 
+#include <fstream>
+
 namespace rt_vision {
 
 DetectorNode::DetectorNode(const rclcpp::NodeOptions &options)
@@ -15,6 +17,8 @@ DetectorNode::DetectorNode(const rclcpp::NodeOptions &options)
   if (this->_isPreview) {
     createPreviewWindow();
   }
+
+  loadClassLabelsFile();
 
   /// FIXME: Use parameter in bringup launch script
   int device = 0;
@@ -61,6 +65,25 @@ void DetectorNode::initializeParameters() {
 void DetectorNode::createPreviewWindow() {
   std::string windowName{"DetectorNode: Preview"};
   cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
+}
+
+void DetectorNode::loadClassLabelsFile() {
+  std::ifstream file(_classLabelsPath);
+  std::string buffer{};
+
+  if (file.fail()) {
+    RCLCPP_ERROR(get_logger(), "Failed to open %s", _classLabelsPath.c_str());
+    rclcpp::shutdown();
+  }
+
+  while (std::getline(file, buffer)) {
+    if (buffer == "")
+      continue;
+    classNames.push_back(buffer);
+  }
+
+  RCLCPP_INFO(get_logger(), "Loaded class labels path: %s",
+              _classLabelsPath.c_str());
 }
 
 } // namespace rt_vision
