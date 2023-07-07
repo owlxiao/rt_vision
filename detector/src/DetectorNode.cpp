@@ -1,6 +1,7 @@
 #include "detector/DetectorNode.h"
 #include "vision/TensorRTDetector.h"
 
+#include <cv_bridge/cv_bridge.h>
 #include <opencv2/highgui.hpp>
 #include <rcpputils/asserts.hpp>
 
@@ -27,6 +28,11 @@ DetectorNode::DetectorNode(const rclcpp::NodeOptions &options)
 
   _inferEngine = std::make_unique<TensorRTDetector>(
       _engineFilePath, device, confNmsThresh, confBboxThresh, _numClasses);
+
+  this->_subImage = image_transport::create_subscription(
+      this, this->_subImageTopicName,
+      std::bind(&DetectorNode::colorImageCallback, this, std::placeholders::_1),
+      "raw");
 }
 
 void DetectorNode::initializeParameters() {
@@ -84,6 +90,11 @@ void DetectorNode::loadClassLabelsFile() {
 
   RCLCPP_INFO(get_logger(), "Loaded class labels path: %s",
               _classLabelsPath.c_str());
+}
+
+void DetectorNode::colorImageCallback(
+    const sensor_msgs::msg::Image::ConstSharedPtr &ptr) {
+  (void)ptr;
 }
 
 } // namespace rt_vision
