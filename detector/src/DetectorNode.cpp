@@ -108,6 +108,8 @@ void DetectorNode::colorImageCallback(
               1000.0f / elapsed.count());
 
   if (this->_isPreview) {
+    _inferEngine->drawObjects(frame, objects, classNames);
+
     cv::imshow("DetectorNode: Preview", frame);
     auto key = cv::waitKey(1);
     if (key == 'q') {

@@ -36,6 +36,9 @@ public:
 
   virtual std::vector<Object> inference(const cv::Mat &frame) = 0;
 
+  void drawObjects(cv::Mat &bgr, const std::vector<Object> &objects,
+                   const std::vector<std::string> classNames);
+
 private:
   void generateGridsAndStride(std::vector<std::size_t> &strides,
                               std::vector<GridAndStride> &gridStrides);
