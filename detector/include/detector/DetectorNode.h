@@ -26,6 +26,8 @@ private:
   std::string _subImageTopicName{};
   std::string _pubObjectsTopicName{};
   std::string _classLabelsPath{};
+  float _confNmsThresh{0.0f};
+  float _confBboxThresh{0.0f};
 
   std::unique_ptr<VisionDetector> _inferEngine{nullptr};
   std::vector<std::string> classNames{};

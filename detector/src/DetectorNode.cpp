@@ -23,11 +23,9 @@ DetectorNode::DetectorNode(const rclcpp::NodeOptions &options)
 
   /// FIXME: Use parameter in bringup launch script
   int device = 0;
-  float confNmsThresh{0.0f};
-  float confBboxThresh{0.0f};
 
   _inferEngine = std::make_unique<TensorRTDetector>(
-      _engineFilePath, device, confNmsThresh, confBboxThresh, _numClasses);
+      _engineFilePath, device, _confNmsThresh, _confBboxThresh, _numClasses);
 
   this->_subImage = image_transport::create_subscription(
       this, this->_subImageTopicName,
@@ -66,6 +64,14 @@ void DetectorNode::initializeParameters() {
   rcpputils::assert_true(!_classLabelsPath.empty());
   RCLCPP_INFO(get_logger(), "Set parameter class_labels_path: `%s`",
               _classLabelsPath.c_str());
+
+  _confBboxThresh = this->declare_parameter<float>("conf_bbox_thresh", 0.0f);
+  RCLCPP_INFO(get_logger(), "Set parameter conf_bbox_thresh: %f",
+              _confBboxThresh);
+
+  _confNmsThresh = this->declare_parameter<float>("conf_nms_thresh", 0.0f);
+  RCLCPP_INFO(get_logger(), "Set parameter conf_nms_thresh: %f",
+              _confNmsThresh);
 }
 
 void DetectorNode::createPreviewWindow() {
