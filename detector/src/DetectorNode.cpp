@@ -110,11 +110,15 @@ void DetectorNode::colorImageCallback(
   auto end = std::chrono::system_clock::now();
   auto elapsed =
       std::chrono::duration_cast<std::chrono::milliseconds>(end - now);
-  RCLCPP_INFO(this->get_logger(), "Inference: %f FPS",
-              1000.0f / elapsed.count());
 
   if (this->_isPreview) {
     _inferEngine->drawObjects(frame, objects, classNames);
+
+    /// Draw inference time on the image
+    std::string timeText =
+        "Inference: " + std::to_string(elapsed.count()) + "ms";
+    cv::putText(frame, timeText, cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX,
+                1.0, cv::Scalar(255, 255, 255), 2);
 
     cv::imshow("DetectorNode: Preview", frame);
     auto key = cv::waitKey(1);
