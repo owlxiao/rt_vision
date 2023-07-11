@@ -61,15 +61,15 @@ DetectorNode::DetectorNode(const rclcpp::NodeOptions &options)
   _objectMarker.color.b = 1.0;
   _objectMarker.lifetime = rclcpp::Duration::from_seconds(0.1);
 
-  _objectMarker.ns = "classification";
-  _objectMarker.action = visualization_msgs::msg::Marker::ADD;
-  _objectMarker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
-  _objectMarker.scale.z = 0.1;
-  _objectMarker.color.a = 1.0;
-  _objectMarker.color.r = 1.0;
-  _objectMarker.color.g = 1.0;
-  _objectMarker.color.b = 1.0;
-  _objectMarker.lifetime = rclcpp::Duration::from_seconds(0.1);
+  _textMarker.ns = "classification";
+  _textMarker.action = visualization_msgs::msg::Marker::ADD;
+  _textMarker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
+  _textMarker.scale.z = 0.1;
+  _textMarker.color.a = 1.0;
+  _textMarker.color.r = 1.0;
+  _textMarker.color.g = 1.0;
+  _textMarker.color.b = 1.0;
+  _textMarker.lifetime = rclcpp::Duration::from_seconds(0.1);
 
   this->_pubMarker =
       this->create_publisher<visualization_msgs::msg::MarkerArray>(
