@@ -5,6 +5,8 @@
 #include <opencv2/highgui.hpp>
 #include <rclcpp/qos.hpp>
 #include <rcpputils/asserts.hpp>
+#include <tf2/LinearMath/Matrix3x3.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
 #include <fstream>
 #include <vision/PnPSolver.h>
@@ -165,12 +167,30 @@ void DetectorNode::bboxToObjectsMsg(rt_interfaces::msg::Objects &msg,
     objectMsg.probability = obj.prob;
     objectMsg.class_id = classNames[obj.label];
 
-    RCLCPP_INFO(get_logger(), "%s", objectMsg.class_id.c_str());
-
-    msg.objects.emplace_back(objectMsg);
-
     cv::Mat rvec, tvec;
     _pnpSolver->solvePnP(obj, rvec, tvec);
+
+    /// fill pose
+    objectMsg.pose.position.x = tvec.at<double>(0);
+    objectMsg.pose.position.y = tvec.at<double>(1);
+    objectMsg.pose.position.z = tvec.at<double>(2);
+
+    /// rvec to 3x3 rotation matrix
+    cv::Mat rotationMatrix;
+    cv::Rodrigues(rvec, rotationMatrix);
+
+    /// rotation matrix to quaternion
+    tf2::Matrix3x3 tf2RotationMatrix(
+        rotationMatrix.at<double>(0, 0), rotationMatrix.at<double>(0, 1),
+        rotationMatrix.at<double>(0, 2), rotationMatrix.at<double>(1, 0),
+        rotationMatrix.at<double>(1, 1), rotationMatrix.at<double>(1, 2),
+        rotationMatrix.at<double>(2, 0), rotationMatrix.at<double>(2, 1),
+        rotationMatrix.at<double>(2, 2));
+    tf2::Quaternion tf2Q;
+    tf2RotationMatrix.getRotation(tf2Q);
+    objectMsg.pose.orientation = tf2::toMsg(tf2Q);
+
+    msg.objects.emplace_back(objectMsg);
   }
 }
 
