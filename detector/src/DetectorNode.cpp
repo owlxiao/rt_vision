@@ -10,6 +10,7 @@
 
 #include <fstream>
 #include <vision/PnPSolver.h>
+#include <visualization_msgs/msg/detail/marker__struct.hpp>
 
 namespace rt_vision {
 
@@ -48,6 +49,31 @@ DetectorNode::DetectorNode(const rclcpp::NodeOptions &options)
             std::make_unique<PnPSolver>(_camInfo->k, _camInfo->d);
         this->_camInfoSub.reset();
       });
+
+  /// Visualization Marker Publisher
+  /// See http://wiki.ros.org/rviz/DisplayTypes/Marker
+  _objectMarker.ns = "objects";
+  _objectMarker.action = visualization_msgs::msg::Marker::ADD;
+  _objectMarker.scale.x = 0.05;
+  _objectMarker.scale.z = 0.125;
+  _objectMarker.color.a = 1.0;
+  _objectMarker.color.g = 0.5;
+  _objectMarker.color.b = 1.0;
+  _objectMarker.lifetime = rclcpp::Duration::from_seconds(0.1);
+
+  _objectMarker.ns = "classification";
+  _objectMarker.action = visualization_msgs::msg::Marker::ADD;
+  _objectMarker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
+  _objectMarker.scale.z = 0.1;
+  _objectMarker.color.a = 1.0;
+  _objectMarker.color.r = 1.0;
+  _objectMarker.color.g = 1.0;
+  _objectMarker.color.b = 1.0;
+  _objectMarker.lifetime = rclcpp::Duration::from_seconds(0.1);
+
+  this->_pubMarker =
+      this->create_publisher<visualization_msgs::msg::MarkerArray>(
+          "/detector/marker", 10);
 }
 
 void DetectorNode::initializeParameters() {
@@ -162,6 +188,12 @@ void DetectorNode::bboxToObjectsMsg(rt_interfaces::msg::Objects &msg,
   rt_interfaces::msg::Object objectMsg;
 
   msg.header = header;
+  _objectMarker.header = header;
+  _textMarker.header = header;
+
+  _markerArray.markers.clear();
+  _objectMarker.id = 0;
+  _textMarker.id = 0;
 
   for (const auto &obj : objects) {
     objectMsg.probability = obj.prob;
@@ -190,9 +222,26 @@ void DetectorNode::bboxToObjectsMsg(rt_interfaces::msg::Objects &msg,
     tf2RotationMatrix.getRotation(tf2Q);
     objectMsg.pose.orientation = tf2::toMsg(tf2Q);
 
+    /// fill the markkers
+    ++_objectMarker.id;
+    _objectMarker.scale.y = 135;
+    _objectMarker.pose = objectMsg.pose;
+
+    ++_textMarker.id;
+    _textMarker.pose.position = objectMsg.pose.position;
+    _textMarker.pose.position.y -= 0.1;
+    _textMarker.text = objectMsg.class_id;
+
+    _markerArray.markers.emplace_back(_objectMarker);
+    _markerArray.markers.emplace_back(_textMarker);
+
     msg.objects.emplace_back(objectMsg);
   }
+
+  publishMarkers();
 }
+
+void DetectorNode::publishMarkers() { _pubMarker->publish(_markerArray); }
 
 } // namespace rt_vision
 

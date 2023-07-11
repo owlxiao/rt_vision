@@ -19,6 +19,7 @@ find_package(cv_bridge REQUIRED)
 find_package(rt_interfaces REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
 
 set(dependencies 
   rclcpp 
@@ -27,6 +28,7 @@ set(dependencies
   cv_bridge rt_interfaces 
   tf2_geometry_msgs 
   geometry_msgs
+  visualization_msgs
 )
 
 add_library(detector_node SHARED src/DetectorNode.cpp)
