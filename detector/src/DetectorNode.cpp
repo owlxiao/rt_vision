@@ -162,7 +162,7 @@ void DetectorNode::colorImageCallback(
       std::chrono::duration_cast<std::chrono::milliseconds>(end - now);
 
   rt_interfaces::msg::Objects objectsMsg;
-  bboxToObjectsMsg(objectsMsg, objects, img->header);
+  bboxToObjectsMsg(objectsMsg, objects, ptr->header);
   _pubObjects->publish(objectsMsg);
 
   if (this->_isPreview) {
@@ -184,7 +184,7 @@ void DetectorNode::colorImageCallback(
 
 void DetectorNode::bboxToObjectsMsg(rt_interfaces::msg::Objects &msg,
                                     std::vector<rt_vision::Object> &objects,
-                                    std_msgs::msg::Header &header) {
+                                    const std_msgs::msg::Header &header) {
   rt_interfaces::msg::Object objectMsg;
 
   msg.header = header;

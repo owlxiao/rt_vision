@@ -26,7 +26,7 @@ private:
 
   void bboxToObjectsMsg(rt_interfaces::msg::Objects &msg,
                         std::vector<rt_vision::Object> &objects,
-                        std_msgs::msg::Header &header);
+                        const std_msgs::msg::Header &header);
 
   void publishMarkers(void);
 
