@@ -54,6 +54,7 @@ DetectorNode::DetectorNode(const rclcpp::NodeOptions &options)
   /// See http://wiki.ros.org/rviz/DisplayTypes/Marker
   _objectMarker.ns = "objects";
   _objectMarker.action = visualization_msgs::msg::Marker::ADD;
+  _objectMarker.type = visualization_msgs::msg::Marker::CUBE;
   _objectMarker.scale.x = 0.05;
   _objectMarker.scale.z = 0.125;
   _objectMarker.color.a = 1.0;
