@@ -224,7 +224,7 @@ void DetectorNode::bboxToObjectsMsg(rt_interfaces::msg::Objects &msg,
 
     /// fill the markkers
     ++_objectMarker.id;
-    _objectMarker.scale.y = 135;
+    _objectMarker.scale.y = 0.135; 
     _objectMarker.pose = objectMsg.pose;
 
     ++_textMarker.id;
