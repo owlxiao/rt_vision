@@ -7,8 +7,6 @@
 #include <rcpputils/asserts.hpp>
 
 #include <fstream>
-#include <rt_interfaces/msg/detail/object__struct.hpp>
-#include <rt_interfaces/msg/detail/objects__struct.hpp>
 
 namespace rt_vision {
 
@@ -37,6 +35,14 @@ DetectorNode::DetectorNode(const rclcpp::NodeOptions &options)
 
   this->_pubObjects = this->create_publisher<rt_interfaces::msg::Objects>(
       "/detector/Objects", rclcpp::SensorDataQoS{});
+
+  this->_camInfoSub = this->create_subscription<sensor_msgs::msg::CameraInfo>(
+      this->_subCameraInfoTopicName, rclcpp::SensorDataQoS{},
+      [this](sensor_msgs::msg::CameraInfo::ConstSharedPtr cameraInfo) {
+        this->_camInfo =
+            std::make_shared<sensor_msgs::msg::CameraInfo>(*cameraInfo);
+        this->_camInfoSub.reset();
+      });
 }
 
 void DetectorNode::initializeParameters() {
@@ -59,6 +65,13 @@ void DetectorNode::initializeParameters() {
   RCLCPP_INFO(get_logger(), "Set parameter subscribe_image_topic_name: `%s`",
               _subImageTopicName.c_str());
   rcpputils::assert_true(!_subImageTopicName.empty());
+
+  _subCameraInfoTopicName =
+      this->declare_parameter<std::string>("subscribe_camera_info_topic_name");
+  rcpputils::assert_true(!_subImageTopicName.empty());
+  RCLCPP_INFO(get_logger(),
+              "Set parameter subscribe_camera_info_topic_name: `%s`",
+              _subCameraInfoTopicName.c_str());
 
   _pubObjectsTopicName = this->declare_parameter<std::string>(
       "publish_objects_topic_name", "detector/objects");

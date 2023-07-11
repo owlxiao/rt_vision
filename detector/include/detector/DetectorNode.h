@@ -6,7 +6,7 @@
 
 #include <image_transport/image_transport.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <std_msgs/msg/detail/header__struct.hpp>
+#include <sensor_msgs/msg/camera_info.hpp>
 
 namespace rt_vision {
 
@@ -30,6 +30,7 @@ private:
   std::size_t _numClasses{};
   std::string _engineFilePath{};
   std::string _subImageTopicName{};
+  std::string _subCameraInfoTopicName{};
   std::string _pubObjectsTopicName{};
   std::string _classLabelsPath{};
   float _confNmsThresh{0.0f};
@@ -41,6 +42,10 @@ private:
   image_transport::Subscriber _subImage;
 
   rclcpp::Publisher<rt_interfaces::msg::Objects>::SharedPtr _pubObjects;
+
+  /// Camera info
+  rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr _camInfoSub;
+  std::shared_ptr<sensor_msgs::msg::CameraInfo> _camInfo;
 };
 
 } // namespace rt_vision
