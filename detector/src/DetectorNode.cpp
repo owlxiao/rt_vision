@@ -7,6 +7,7 @@
 #include <rcpputils/asserts.hpp>
 
 #include <fstream>
+#include <vision/PnPSolver.h>
 
 namespace rt_vision {
 
@@ -41,6 +42,8 @@ DetectorNode::DetectorNode(const rclcpp::NodeOptions &options)
       [this](sensor_msgs::msg::CameraInfo::ConstSharedPtr cameraInfo) {
         this->_camInfo =
             std::make_shared<sensor_msgs::msg::CameraInfo>(*cameraInfo);
+        this->_pnpSolver =
+            std::make_unique<PnPSolver>(_camInfo->k, _camInfo->d);
         this->_camInfoSub.reset();
       });
 }
@@ -165,6 +168,9 @@ void DetectorNode::bboxToObjectsMsg(rt_interfaces::msg::Objects &msg,
     RCLCPP_INFO(get_logger(), "%s", objectMsg.class_id.c_str());
 
     msg.objects.emplace_back(objectMsg);
+
+    cv::Mat rvec, tvec;
+    _pnpSolver->solvePnP(obj, rvec, tvec);
   }
 }
 

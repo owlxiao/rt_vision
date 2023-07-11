@@ -29,7 +29,11 @@ endif()
 # CUDA package include directory
 include_directories(${CUDA_INCLUDE_DIRS})
 
-set(SRC ${SRC} src/TensorRTDetector.cpp src/VisionDetector.cpp)
+set(SRC ${SRC} 
+  src/TensorRTDetector.cpp 
+  src/VisionDetector.cpp
+  src/PnPSolver.cpp
+)
 
 add_library(vision SHARED 
   ${SRC}
@@ -66,6 +70,11 @@ install(
   ARCHIVE DESTINATION lib
   RUNTIME DESTINATION bin
   INCLUDES DESTINATION include
+)
+
+install(
+  DIRECTORY include/
+  DESTINATION include
 )
 
 if(BUILD_TESTING)

@@ -2,6 +2,7 @@
 #define DETECTOR_DETECTORNODE_H
 
 #include "rt_interfaces/msg/objects.hpp"
+#include "vision/PnPSolver.h"
 #include "vision/VisionDetector.h"
 
 #include <image_transport/image_transport.hpp>
@@ -46,6 +47,7 @@ private:
   /// Camera info
   rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr _camInfoSub;
   std::shared_ptr<sensor_msgs::msg::CameraInfo> _camInfo;
+  std::unique_ptr<PnPSolver> _pnpSolver;
 };
 
 } // namespace rt_vision
