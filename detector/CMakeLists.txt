@@ -16,8 +16,9 @@ find_package(rclcpp_components REQUIRED)
 find_package(vision REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(cv_bridge REQUIRED)
+find_package(rt_interfaces REQUIRED)
 
-set(dependencies rclcpp rclcpp_components vision image_transport cv_bridge)
+set(dependencies rclcpp rclcpp_components vision image_transport cv_bridge rt_interfaces)
 
 add_library(detector_node SHARED src/DetectorNode.cpp)
 ament_target_dependencies(detector_node ${dependencies})

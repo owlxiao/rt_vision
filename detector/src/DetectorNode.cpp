@@ -3,9 +3,12 @@
 
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/highgui.hpp>
+#include <rclcpp/qos.hpp>
 #include <rcpputils/asserts.hpp>
 
 #include <fstream>
+#include <rt_interfaces/msg/detail/object__struct.hpp>
+#include <rt_interfaces/msg/detail/objects__struct.hpp>
 
 namespace rt_vision {
 
@@ -31,6 +34,9 @@ DetectorNode::DetectorNode(const rclcpp::NodeOptions &options)
       this, this->_subImageTopicName,
       std::bind(&DetectorNode::colorImageCallback, this, std::placeholders::_1),
       "raw");
+
+  this->_pubObjects = this->create_publisher<rt_interfaces::msg::Objects>(
+      "/detector/Objects", rclcpp::SensorDataQoS{});
 }
 
 void DetectorNode::initializeParameters() {
@@ -111,6 +117,10 @@ void DetectorNode::colorImageCallback(
   auto elapsed =
       std::chrono::duration_cast<std::chrono::milliseconds>(end - now);
 
+  rt_interfaces::msg::Objects objectsMsg;
+  bboxToObjectsMsg(objectsMsg, objects, img->header);
+  _pubObjects->publish(objectsMsg);
+
   if (this->_isPreview) {
     _inferEngine->drawObjects(frame, objects, classNames);
 
@@ -125,6 +135,23 @@ void DetectorNode::colorImageCallback(
     if (key == 'q') {
       rclcpp::shutdown();
     }
+  }
+}
+
+void DetectorNode::bboxToObjectsMsg(rt_interfaces::msg::Objects &msg,
+                                    std::vector<rt_vision::Object> &objects,
+                                    std_msgs::msg::Header &header) {
+  rt_interfaces::msg::Object objectMsg;
+
+  msg.header = header;
+
+  for (const auto &obj : objects) {
+    objectMsg.probability = obj.prob;
+    objectMsg.class_id = classNames[obj.label];
+
+    RCLCPP_INFO(get_logger(), "%s", objectMsg.class_id.c_str());
+
+    msg.objects.emplace_back(objectMsg);
   }
 }
 
