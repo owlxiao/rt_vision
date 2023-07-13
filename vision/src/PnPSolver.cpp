@@ -23,21 +23,22 @@ PnPSolver::PnPSolver(const std::array<double, 9> &camera_matrix,
 }
 
 bool PnPSolver::solvePnP(const Object &obj, cv::Mat &rvec, cv::Mat &tvec) {
-  std::vector<cv::Point2f> image_armor_points;
+  std::vector<cv::Point2f> image_points;
 
   // Fill in image points
-  image_armor_points.emplace_back(
-      cv::Point2f(obj.rect.x, obj.rect.y)); /// Top-left corner
-  image_armor_points.emplace_back(cv::Point2f(
+  image_points.emplace_back(cv::Point2f(
       obj.rect.x, obj.rect.y + obj.rect.height)); /// Bottom-left corner
-  image_armor_points.emplace_back(cv::Point2f(obj.rect.x + obj.rect.width,
-                                              obj.rect.y)); /// Top-right corner
-  image_armor_points.emplace_back(
+  image_points.emplace_back(
+      cv::Point2f(obj.rect.x, obj.rect.y)); /// Top-left corner
+
+  image_points.emplace_back(cv::Point2f(obj.rect.x + obj.rect.width,
+                                        obj.rect.y)); /// Top-right corner
+  image_points.emplace_back(
       cv::Point2f(obj.rect.x + obj.rect.width,
                   obj.rect.y + obj.rect.height)); /// Bottom-right corner
 
-  return cv::solvePnP(_tinderPoints, image_armor_points, _cameraMatrix,
-                      _distCoeffs, rvec, tvec, false, cv::SOLVEPNP_IPPE);
+  return cv::solvePnP(_tinderPoints, image_points, _cameraMatrix, _distCoeffs,
+                      rvec, tvec, false, cv::SOLVEPNP_IPPE);
 }
 
 } // namespace rt_vision
