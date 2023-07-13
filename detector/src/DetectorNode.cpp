@@ -249,6 +249,18 @@ void DetectorNode::bboxToObjectsMsg(rt_interfaces::msg::Objects &msg,
     tf2RotationMatrix.getRotation(tf2Q);
     objectMsg.pose.orientation = tf2::toMsg(tf2Q);
 
+    ///// Tranform objects position from image frame to world coordinate
+    geometry_msgs::msg::PoseStamped ps;
+    ps.header = header;
+    ps.pose = objectMsg.pose;
+
+    try {
+      objectMsg.pose = _tf2Buffer->transform(ps, _targetFrame).pose;
+    } catch (const tf2::ExtrapolationException &ex) {
+      RCLCPP_ERROR(get_logger(), "Error while transforming %s", ex.what());
+      return;
+    }
+
     /// fill the markkers
     ++_objectMarker.id;
     _objectMarker.scale.y = 0.135;
