@@ -6,9 +6,14 @@
 #include "vision/VisionDetector.h"
 
 #include <image_transport/image_transport.hpp>
+#include <memory>
+#include <message_filters/subscriber.h>
 #include <rclcpp/rclcpp.hpp>
+#include <rt_interfaces/msg/detail/objects__struct.hpp>
 #include <sensor_msgs/msg/camera_info.hpp>
-#include <visualization_msgs/msg/detail/marker__struct.hpp>
+#include <tf2_ros/buffer.h>
+#include <tf2_ros/message_filter.h>
+#include <tf2_ros/transform_listener.h>
 #include <visualization_msgs/msg/marker_array.hpp>
 
 namespace rt_vision {
@@ -46,7 +51,6 @@ private:
 
   image_transport::Subscriber _subImage;
 
-  // rt_interfaces::msg::Objects _pubObjectsMsg;
   rclcpp::Publisher<rt_interfaces::msg::Objects>::SharedPtr _pubObjects;
 
   /// Camera info
@@ -59,6 +63,11 @@ private:
   visualization_msgs::msg::Marker _textMarker;
   visualization_msgs::msg::MarkerArray _markerArray;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr _pubMarker;
+
+  /// Subscriber with tf2 message_filter
+  std::string _targetFrame{};
+  std::shared_ptr<tf2_ros::Buffer> _tf2Buffer;
+  std::shared_ptr<tf2_ros::TransformListener> _tf2Listener;
 };
 
 } // namespace rt_vision

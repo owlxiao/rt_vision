@@ -2,13 +2,16 @@
 #include "vision/TensorRTDetector.h"
 
 #include <cv_bridge/cv_bridge.h>
+#include <memory>
 #include <opencv2/highgui.hpp>
 #include <rclcpp/qos.hpp>
 #include <rcpputils/asserts.hpp>
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#include <tf2_ros/create_timer_ros.h>
 
 #include <fstream>
+#include <tf2_ros/transform_listener.h>
 #include <vision/PnPSolver.h>
 #include <visualization_msgs/msg/detail/marker__struct.hpp>
 
@@ -75,6 +78,16 @@ DetectorNode::DetectorNode(const rclcpp::NodeOptions &options)
   this->_pubMarker =
       this->create_publisher<visualization_msgs::msg::MarkerArray>(
           "/detector/marker", 10);
+
+  _tf2Buffer = std::make_shared<tf2_ros::Buffer>(this->get_clock());
+
+  auto timerInterface = std::make_shared<tf2_ros::CreateTimerROS>(
+      this->get_node_base_interface(), this->get_node_timers_interface());
+  _tf2Buffer->setCreateTimerInterface(timerInterface);
+
+  _tf2Listener = std::make_shared<tf2_ros::TransformListener>(*_tf2Buffer);
+
+  _targetFrame = "odom";
 }
 
 void DetectorNode::initializeParameters() {
@@ -164,6 +177,19 @@ void DetectorNode::colorImageCallback(
 
   rt_interfaces::msg::Objects objectsMsg;
   bboxToObjectsMsg(objectsMsg, objects, ptr->header);
+
+  for (auto &obj : objectsMsg.objects) {
+    geometry_msgs::msg::PoseStamped ps;
+    ps.header = ptr->header;
+    ps.pose = obj.pose;
+    try {
+      obj.pose = _tf2Buffer->transform(ps, _targetFrame).pose;
+    } catch (const tf2::ExtrapolationException &ex) {
+      RCLCPP_ERROR(get_logger(), "Error while transforming %s", ex.what());
+      return;
+    }
+  }
+
   _pubObjects->publish(objectsMsg);
 
   if (this->_isPreview) {
@@ -225,7 +251,7 @@ void DetectorNode::bboxToObjectsMsg(rt_interfaces::msg::Objects &msg,
 
     /// fill the markkers
     ++_objectMarker.id;
-    _objectMarker.scale.y = 0.135; 
+    _objectMarker.scale.y = 0.135;
     _objectMarker.pose = objectMsg.pose;
 
     ++_textMarker.id;
